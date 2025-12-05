@@ -577,18 +577,24 @@
 	i2c-scl-rising-time-ns = <600>;
 	i2c-scl-falling-time-ns = <40>;
 	status = "okay";
-#if TOUCH_SCREEN
 	touchscreen@48 {
 		reg = <0x48>;
 		compatible = "himax,hx8527e", "himax,hx852es";
 		interrupt-parent = <&gpio3>;
-		interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
+		interrupts = <RK_PB5 IRQ_TYPE_EDGE_FALLING>;
+		
+		pinctrl-names = "default";
+		pinctrl-0 =   <&touch_rst_pin>,<&touch_irq_pin>;
 		reset-gpios = <&gpio3 RK_PB4 GPIO_ACTIVE_LOW>;
 		vcca-supply = <&vcc3v0_tp>;
-		pinctrl-0 =   <&touch_rst_pin>;
-	};
-#endif 
 
+		touchscreen-size-x = <480>;
+		touchscreen-size-y = <800>;
+
+		// touchscreen-inverted-x;
+        // touchscreen-inverted-y;
+        // touchscreen-swapped-x-y;
+	};
 };
 
 &i2c7 {
@@ -640,6 +646,10 @@
 
 		touch_rst_pin: touch-rst-pin {
 			rockchip,pins = <3 RK_PB4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		touch_irq_pin: touch-irq-pin {
+			rockchip,pins = <3 RK_PB5 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 

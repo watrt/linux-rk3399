@@ -20,7 +20,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/regulator/consumer.h>
-#include <linux/unaligned.h>
+#include <asm/unaligned.h>
 
 #define HX852X_COORD_SIZE(fingers)	((fingers) * sizeof(struct hx852x_coord))
 #define HX852X_WIDTH_SIZE(fingers)	ALIGN(fingers, 4)
@@ -48,12 +48,13 @@
 #define HX852X_SRAM_SWITCH_TEST_MODE	0x14
 #define HX852X_SRAM_ADDR_CONFIG		0x7000
 
+
 struct hx852x {
 	struct i2c_client *client;
 	struct input_dev *input_dev;
 	struct touchscreen_properties props;
 	struct gpio_desc *reset_gpiod;
-	struct regulator_bulk_data supplies[2];
+	struct regulator_bulk_data supplies[1];
 	unsigned int max_fingers;
 	unsigned int keycount;
 	unsigned int keycodes[HX852X_MAX_KEY_COUNT];
@@ -257,6 +258,7 @@ static int hx852x_handle_events(struct hx852x *hx)
 	 * Load everything into a 32-bit aligned buffer so the coordinates
 	 * can be assigned directly, without using get_unaligned_*().
 	 */
+
 	u8 buf[HX852X_MAX_BUF_SIZE] __aligned(4);
 	struct hx852x_coord *coord = (struct hx852x_coord *)buf;
 	u8 *width = &buf[HX852X_COORD_SIZE(hx->max_fingers)];
@@ -370,7 +372,7 @@ static int hx852x_parse_properties(struct hx852x *hx)
 	return 0;
 }
 
-static int hx852x_probe(struct i2c_client *client)
+static int hx852x_probe(struct i2c_client *client,const struct i2c_device_id *id)
 {
 	struct device *dev = &client->dev;
 	struct hx852x *hx;
@@ -402,7 +404,7 @@ static int hx852x_probe(struct i2c_client *client)
 	input_set_drvdata(hx->input_dev, hx);
 
 	hx->supplies[0].supply = "vcca";
-	hx->supplies[1].supply = "vccd";
+	// hx->supplies[1].supply = "vccd";
 	error = devm_regulator_bulk_get(dev, ARRAY_SIZE(hx->supplies), hx->supplies);
 	if (error)
 		return dev_err_probe(dev, error, "failed to get regulators\n");
