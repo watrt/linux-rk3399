@@ -7,7 +7,7 @@
 #include "rk3399-opp.dtsi"
 #include "rk3399-linux.dtsi"
 
-#define SOUND_CARD  1
+#define SOUND_CARD  0
 #define TOUCH_SCREEN 1
 
 / {
@@ -554,7 +554,7 @@
 		clock-names = "mclk";
 		pinctrl-names = "default";
 		pinctrl-0 = <&i2s_8ch_mclk>, <&speaker_pin>;
-		spk-con-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_HIGH>;
+		spk-con-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_LOW>;
 	};
 #endif 
 };
@@ -838,7 +838,7 @@
 
 &usbdrd_dwc3_0 {
 	status = "okay";
-	maximum-speed = "high-speed";
+	maximum-speed ="high-speed";
 	phys = <&u2phy0_otg>;
     phy-names = "usb2-phy";
 	dr_mode = "otg";
@@ -916,41 +916,9 @@
 		];
 
 		display-timings {
-			native-mode = <&timing_45fps>;
-			timing_30fps: timing0 {
+			native-mode = <&timing0>;
+			timing0: timing0 {
 				clock-frequency = <12948000>;
-				hactive = <480>;
-				vactive = <800>;
-				hback-porch = <20>;
-				hfront-porch = <10>;
-				vback-porch = <10>;
-				vfront-porch = <10>;
-				hsync-len = <10>;
-				vsync-len = <10>;
-				hsync-active = <0x0>;
-				vsync-active = <0x0>;
-				de-active = <0x00>;
-				pixelclk-active = <0x00>;
-			};
-
-			timing_45fps: timing1 {
-				clock-frequency = <19422000>;
-				hactive = <480>;
-				vactive = <800>;
-				hback-porch = <20>;
-				hfront-porch = <10>;
-				vback-porch = <10>;
-				vfront-porch = <10>;
-				hsync-len = <10>;
-				vsync-len = <10>;
-				hsync-active = <0x0>;
-				vsync-active = <0x0>;
-				de-active = <0x00>;
-				pixelclk-active = <0x00>;
-			};
-
-			timing_60fps: timing2 {
-				clock-frequency = <25896000>;
 				hactive = <480>;
 				vactive = <800>;
 				hback-porch = <20>;

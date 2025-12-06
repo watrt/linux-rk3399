@@ -526,7 +526,6 @@ static int es8316_mute(struct snd_soc_dai *dai, int mute, int direction)
 	struct es8316_priv *es8316 = snd_soc_component_get_drvdata(component);
 	if (es8316->spk_ctl_gpio) {
 		gpiod_set_value(es8316->spk_ctl_gpio, mute ? 0: 1);
-		dev_warn(component->dev, "%s.%d mute=%d\n",__FUNCTION__,__LINE__,mute);
 	}
 	snd_soc_component_update_bits(dai->component, ES8316_DAC_SET1, 0x20,
 			    mute ? 0x20 : 0);
