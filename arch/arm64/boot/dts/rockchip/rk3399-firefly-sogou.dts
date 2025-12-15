@@ -7,9 +7,8 @@
 #include "rk3399-opp.dtsi"
 #include "rk3399-linux.dtsi"
 
-#define GPU_STRATEGY 1  /*1:Panfrost GPU  0:Midgard GPU*/
-#define SOUND_CARD  1
-#define TOUCH_SCREEN 1
+#define BLUETOOTH_ON  1
+#define GPU_STRATEGY  0 /*1:Panfrost GPU  0:Midgard GPU*/
 #define CAMERA_ONLINE 0
 / {
 	model = "Sogo Translation Bao";
@@ -194,7 +193,6 @@
 		reset-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_LOW>;
 	};
 
-#if SOUND_CARD
 	//DONE
 	es8316-sound {
 		compatible = "simple-audio-card";
@@ -223,7 +221,6 @@
 			sound-dai = <&es8316>;
 		};
 	};
-#endif 
 
 };
 
@@ -548,7 +545,7 @@
 	status = "okay";
 	i2c-scl-rising-time-ns = <300>;
 	i2c-scl-falling-time-ns = <30>;
-#if SOUND_CARD
+
 	es8316: es8316@10 {
 		#sound-dai-cells = <0>;
 		compatible = "everest,es8316";
@@ -559,7 +556,7 @@
 		pinctrl-0 = <&i2s_8ch_mclk>, <&speaker_pin>;
 		spk-con-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_HIGH>;
 	};
-#endif 
+
 };
 
 &i2c4 {
@@ -586,10 +583,6 @@
 
 		touchscreen-size-x = <480>;
 		touchscreen-size-y = <800>;
-
-		// touchscreen-inverted-x;
-        // touchscreen-inverted-y;
-        // touchscreen-swapped-x-y;
 	};
 };
 
@@ -831,6 +824,28 @@
 };
 
 
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_xfer &uart0_cts &uart0_rts>;
+	status = "okay";
+
+	bluetooth {
+		compatible = "brcm,bcm43438-bt";
+	//	clocks = <&rk818 1>;
+	//	clock-names = "ext_clock";
+		shutdown-gpios = <&gpio0 RK_PB1 GPIO_ACTIVE_HIGH>;
+		device-wakeup-gpios = <&gpio2 RK_PD2 GPIO_ACTIVE_HIGH>;
+		host-wakeup-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_HIGH>;
+		
+		max-speed = <1500000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&bt_reset_gpio>,<&bt_wake_gpio>, <&bt_irq_gpio>;
+		vbat-supply = <&vcc3v3_sys>;
+		vddio-supply = <&vcc_1v8>;
+	};
+};
+
+
 &sdmmc {
 	clock-frequency = <150000000>;
 	max-frequency = <150000000>;
@@ -862,13 +877,6 @@
 	rockchip,hw-tshut-temp = <110000>;
 	status = "okay";
 };
-
-&uart0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart0_xfer &uart0_cts>;
-	status = "okay";
-};
-
 
 
 &u2phy0 {
