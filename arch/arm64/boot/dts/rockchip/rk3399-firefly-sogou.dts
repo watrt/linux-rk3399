@@ -543,6 +543,7 @@
 
 &i2c1 {
 	status = "okay";
+	clock-frequency = <400000>;
 	i2c-scl-rising-time-ns = <300>;
 	i2c-scl-falling-time-ns = <30>;
 
@@ -557,9 +558,65 @@
 		spk-con-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_HIGH>;
 	};
 
+#if CAMERA_ONLINE
+	vm149c: vm149c@0c {
+		compatible = "silicon touch,vm149c";
+		status = "okay";
+		reg = <0x0c>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+	};
+#endif 
+
+#if CAMERA_ONLINE
+	ov8858: ov8858@36 {
+		status = "okay";
+		compatible = "ovti,ov8858";
+		reg = <0x36>;
+#else 
+	ov8858: ov8858@35 {
+		status = "okay";
+		compatible = "ovti,ov8858";
+		reg = <0x35>;
+#endif 
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+		pinctrl-0 = <&cif_clkout>,<&camera_pwr>,<&camera_rst>,<&camera_pdn>;
+		
+		avdd-supply = <&vcc1v8_dvp>;
+		rockchip,camera-module-debug-freq = <1>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "JSD3425-C1";
+		rockchip,camera-module-lens-name = "JSD3425-C1";
+
+		power-gpios = <&gpio1 RK_PA2 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio2 RK_PD4 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio2 RK_PD3 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "rockchip,camera_default";
+		
+#if CAMERA_ONLINE
+		/* reset-gpios = <>; */
+		/*	avdd-supply = <>; */
+		/*	dovdd-supply = <>; */
+		/*	dvdd-supply = <>; */
+		reset-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 29 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "rockchip,camera_default";
+		port {
+			ucam_out1: endpoint {
+				//remote-endpoint = <&mipi_in_ucam0>;
+				remote-endpoint = <&mipi_in_ucam1>;
+				data-lanes = <1 2>;
+			};
+		};
+#endif 
+	};
+
 };
 
 &i2c4 {
+	clock-frequency = <400000>;
 	i2c-scl-rising-time-ns = <600>;
 	i2c-scl-falling-time-ns = <40>;
 	status = "okay";
@@ -567,6 +624,7 @@
 
 
 &i2c5 {
+	clock-frequency = <400000>;
 	i2c-scl-rising-time-ns = <600>;
 	i2c-scl-falling-time-ns = <40>;
 	status = "okay";
@@ -586,47 +644,6 @@
 	};
 };
 
-&i2c7 {
-	status = "okay";
-
-	ov8858: ov8858@36 {
-		status = "okay";
-		compatible = "ovti,ov8858";
-		reg = <0x36>;
-		clocks = <&cru SCLK_CIF_OUT>;
-		clock-names = "xvclk";
-
-		avdd-supply = <&vcc1v8_dvp>;
-		rockchip,camera-module-debug-freq = <1>;
-		rockchip,camera-module-index = <1>;
-		rockchip,camera-module-facing = "front";
-		rockchip,camera-module-name = "JSD3425-C1";
-		rockchip,camera-module-lens-name = "JSD3425-C1";
-
-		power-gpios = <&gpio1 RK_PA2 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&gpio2 RK_PD3 GPIO_ACTIVE_LOW>;
-		pwdn-gpios = <&gpio2 RK_PD4 GPIO_ACTIVE_LOW>;
-		pinctrl-names = "rockchip,camera_default";
-		pinctrl-0 = <&camera_pwr>,<&camera_rst>,<&camera_pdn>;
-#if CAMERA_ONLINE
-		/* reset-gpios = <>; */
-		/*	avdd-supply = <>; */
-		/*	dovdd-supply = <>; */
-		/*	dvdd-supply = <>; */
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
-		pwdn-gpios = <&gpio4 29 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "rockchip,camera_default";
-		pinctrl-0 = <&cif_clkout>;
-		port {
-			ucam_out1: endpoint {
-				//remote-endpoint = <&mipi_in_ucam0>;
-				remote-endpoint = <&mipi_in_ucam1>;
-				data-lanes = <1 2>;
-			};
-		};
-#endif 
-	};
-};
 
 &i2s0 {
 	rockchip,i2s-broken-burst-len;
