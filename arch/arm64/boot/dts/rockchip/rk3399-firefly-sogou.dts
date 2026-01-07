@@ -10,6 +10,7 @@
 #define BLUETOOTH_ON  1
 #define GPU_STRATEGY  0 /*1:Panfrost GPU  0:Midgard GPU*/
 #define CAMERA_ONLINE 0
+#define BAT_ALWAYS_CHARGE 1
 / {
 	model = "Sogo Translation Bao";
 	compatible = "SogoTranslation,rk3399", "rockchip,rk3399";
@@ -152,6 +153,7 @@
 	};
 
 	//DONE
+#if (BAT_ALWAYS_CHARGE == 0)
 	vcc5v0_host: vcc5v0-host-regulator {
 		compatible = "regulator-fixed";
 		enable-active-high;
@@ -161,6 +163,7 @@
 		regulator-name = "vcc5v0_host";
 		regulator-always-on;
 	};
+#endif 
 
 	//DONE
 	vdd_log: vdd-log {
@@ -324,10 +327,14 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pmic_int_l>;
 		rockchip,system-power-controller;
-		rk818,support_dc_chg = <1>;/*1: dc chg; 0:usb chg*/
-		wakeup-source;
+		
+#if (BAT_ALWAYS_CHARGE == 0)
+	rk818,support_dc_chg = <1>;/*1: dc chg; 0:usb chg*/
+#else
+	rk818,support_dc_chg = <0>;/*1: dc chg; 0:usb chg*/
+#endif 
 		extcon = <&u2phy0>;
-	
+		wakeup-source;
 		#clock-cells = <1>;
 
 		vcc1-supply = <&vcc_sys>;
@@ -899,11 +906,12 @@
 &u2phy0 {
 	status = "okay";
 	u2phy0_otg: otg-port {
+#if BAT_ALWAYS_CHARGE == 0
 		vbus-supply = <&vcc5v0_host>;
+#endif 
 		status = "okay";
 	};
 };
-
 &usbdrd3_0 {
 	extcon = <&u2phy0>;
 	status = "okay";
